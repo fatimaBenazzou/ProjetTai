@@ -1,8 +1,28 @@
 import numpy as np
 import cv2
+import argparse
+import os
+ABSOLUTE_PATH = os.getcwd()
 
-# Load video stream
-cap = cv2.VideoCapture(r'C:\Users\auros\old_pc\fatima\Miv\TAI\ProjetTai\walking.avi')
+parser = argparse.ArgumentParser(description='Optical flow')
+# prend le chemin de la video en tant que 1er argument
+parser.add_argument('-i', action='store', dest='input', required=True,
+                    help='Input Video.')
+
+arguments = parser.parse_args()
+
+cap = cv2.VideoCapture(ABSOLUTE_PATH+"//"+arguments.input)
+
+ret, frame = cap.read()  # Get one ret and frame
+h, w, _ = frame.shape  # Use frame to get width and height
+fps = int(cap.get(cv2.CAP_PROP_FPS))
+fnb = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # nombre de frames
+fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))  # encodage de la video
+
+frameTime = 1  # int(1000 / fps )  # temps d'attente entre frame
+
+writer = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input +
+                         "-Output.mp4", fourcc, fps, (w, h))  # Video writing device
 
 # Set parameters for ShiTomasi corner detection """SHITOMASI CORNER DETECTION"""
 feature_params = dict(maxCorners=100,
@@ -31,12 +51,9 @@ mask = np.zeros_like(prev_frame)
 
 frame_counter = 0
 
-while 1:
-    ret, frame = cap.read()
+while ret:
     frame_counter += 1
-    if frame_counter == int(cap.get(cv2.CAP_PROP_FRAME_COUNT))-1:
-        frame_counter = 0
-        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    print(round(frame_counter / fnb * 100, 2), flush=True)
 
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -55,20 +72,24 @@ while 1:
     for i, (new, old) in enumerate(zip(good_new, good_old)):
         a, b = new.ravel()
         c, d = old.ravel()
-        mask = cv2.line(mask, (int(a), int(b)), (int(c), int(d)), color[i].tolist(), 2)
+        mask = cv2.line(mask, (int(a), int(b)),
+                        (int(c), int(d)), color[i].tolist(), 2)
         frame = cv2.circle(frame, (int(a), int(b)), 5, color[i].tolist(), -1)
 
     img = cv2.add(frame, mask)
 
     # Show Optical Flow
-    cv2.imshow('Optical Flow - Lucas-Kanade', img)
-    if cv2.waitKey(1) == 13:  # 13 is the Enter Key
-        break
+    # cv2.imshow('Optical Flow - Lucas-Kanade', img)
+    writer.write(img)  # Write frame
+    # cv2.waitKey(frameTime)
 
     # Now update the previous frame and previous points
     prev_gray = frame_gray.copy()
     prev_corners = good_new.reshape(-1, 1, 2)
 
+    ret, frame = cap.read()
 
-cv2.destroyAllWindows()
+
+# cv2.destroyAllWindows()
+writer.release()
 cap.release()
