@@ -31,17 +31,15 @@ app.use(
 if (process.env.STATIC) app.use("/files", filesRoutes);
 
 app.use(express.json());
-app.get("/:input", (req, res) => {
+
+const lancher = (script) => (req, res) => {
   const { input = "walking.mp4" } = req.params;
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Transfer-Encoding', 'chunked');
-  const commande = spawn( //creer un ss processus qui lance la commande python
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("Transfer-Encoding", "chunked");
+  const commande = spawn(
+    //creer un ss processus qui lance la commande python
     "python ",
-    [ "-u",
-      "./scripts/BackgroundSub.py",
-      "-i",
-      "./public/" + input,
-    ],
+    ["-u", "./scripts/" + script, "-i", "./public/" + input],
     { shell: true }
   );
 
@@ -57,7 +55,10 @@ app.get("/:input", (req, res) => {
   commande.on("close", (code) => {
     res.end();
   });
-});
+};
+
+app.get("/backgroundsub/:input", lancher("BackgroundSub.py"));
+app.get("/opticalflow/:input", lancher("OpticalFlow.py"));
 
 app.use((err, req, res, next) => {
   const error =
