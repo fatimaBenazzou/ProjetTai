@@ -33,6 +33,7 @@ writerM = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input +
                           "-Mask.mp4", fourcc, fps, (w, h))  # Video writing device
 
 while ret:  # Use the ret to determin end of video
+    frameCounter += 1
     print(round(frameCounter / fnb * 100, 2), flush=True) 
     foreground_mask = foreground_background.apply(
         frame)  # cree un masque sans le bg
@@ -42,7 +43,6 @@ while ret:  # Use the ret to determin end of video
     newFrame = cv2.bitwise_and(frame, foreground_mask)
     writerM.write(foreground_mask)  # Write frame
     writer.write(newFrame)  # Write frame
-    frameCounter += 1
 
     ret, frame = cap.read()
 
