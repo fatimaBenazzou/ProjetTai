@@ -11,9 +11,6 @@ parser = argparse.ArgumentParser(description='Background subtraction')
 parser.add_argument('-i', action='store', dest='input', required=True,
                     help='Input Video.')
 
-# prend le nom de la video resultante en tant que 2eme argument
-parser.add_argument('-o', action='store', dest='output', required=True,
-                    help='Output Video.')
 arguments = parser.parse_args()
 
 cap = cv2.VideoCapture(ABSOLUTE_PATH+"//"+arguments.input)
@@ -26,20 +23,22 @@ ret, frame = cap.read()  # Get one ret and frame
 h, w, _ = frame.shape  # Use frame to get width and height
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 fnb = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # nombre de frames
+fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))  # encodage de la video
 
-# XVID is the ID, can be changed to anything
-fourcc = cv2.VideoWriter_fourcc(*"XVID")
-frameTime = int(1000 / fps / 10)  # Calculate
-writer = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.output +
-                         ".avi", fourcc, fps, (w, h))  # Video writing device
-writerM = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.output +
-                          "-Mask.avi", fourcc, fps, (w, h))  # Video writing device
+frameTime = 1  # int(1000 / fps )  # temps d'attente entre frame
+
+writer = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input +
+                         "-Output.mp4", fourcc, fps, (w, h))  # Video writing device
+writerM = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input +
+                          "-Mask.mp4", fourcc, fps, (w, h))  # Video writing device
 
 while ret:  # Use the ret to determin end of video
-    print(int(frameCounter / fnb * 100))
-    foreground_mask = foreground_background.apply(frame)
+    print(round(frameCounter / fnb * 100, 2), flush=True) 
+    foreground_mask = foreground_background.apply(
+        frame)  # cree un masque sans le bg
+    # reshape la matrice du masque de 1 a 3 channels
     foreground_mask = cv2.cvtColor(foreground_mask, cv2.COLOR_GRAY2RGB)
-
+    # soustraction en utilisant le masque (eyweli rgb : frame*masque)
     newFrame = cv2.bitwise_and(frame, foreground_mask)
     writerM.write(foreground_mask)  # Write frame
     writer.write(newFrame)  # Write frame
