@@ -35,7 +35,7 @@ app.get("/:input", (req, res) => {
   const { input = "walking.mp4" } = req.params;
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Transfer-Encoding', 'chunked');
-  const commande = spawn(
+  const commande = spawn( //creer un ss processus qui lance la commande python
     "python ",
     [ "-u",
       "./scripts/BackgroundSub.py",
