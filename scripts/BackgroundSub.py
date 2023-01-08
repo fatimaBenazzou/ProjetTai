@@ -27,10 +27,10 @@ fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))  # encodage de la video
 
 frameTime = 1  # int(1000 / fps )  # temps d'attente entre frame
 
-writer = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input +
-                         "-Output.mp4", fourcc, fps, (w, h))  # Video writing device
-writerM = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input +
-                          "-Mask.mp4", fourcc, fps, (w, h))  # Video writing device
+writer = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input[:-4] +
+                         "-subb.mp4", fourcc, fps, (w, h))  # Video writing device
+writerM = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input[:-4] +
+                          "-mask.mp4", fourcc, fps, (w, h))  # Video writing device
 
 while ret:  # Use the ret to determin end of video
     frameCounter += 1

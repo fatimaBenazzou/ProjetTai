@@ -17,7 +17,7 @@ const router = Router();
 
 router.post("/", upload.single("file"), (req, res, next) => {
     if (!req.file) return next(new Error("No file received"));
-    else return res.json({ ...req.file, name: "Uploading File", message: "File has been uploaded" });
+    else return res.json({filename:path.parse(req.file.filename).name , name: "Uploading File", message: "File has been uploaded" });
 });
 
 router.delete("/:name", (req, res, next) => {

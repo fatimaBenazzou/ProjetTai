@@ -21,8 +21,8 @@ fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))  # encodage de la video
 
 frameTime = 1  # int(1000 / fps )  # temps d'attente entre frame
 
-writer = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input +
-                         "-Output.mp4", fourcc, fps, (w, h))  # Video writing device
+writer = cv2.VideoWriter(ABSOLUTE_PATH+"//"+arguments.input[:-4] +
+                         "-of.mp4", fourcc, fps, (w, h))  # Video writing device
 
 # Set parameters for ShiTomasi corner detection """SHITOMASI CORNER DETECTION"""
 feature_params = dict(maxCorners=100,
